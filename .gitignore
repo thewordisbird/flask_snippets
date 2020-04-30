@@ -132,7 +132,9 @@ dmypy.json
 .vscode
 
 # local api keys
-/keys
+keys/
 
 # macos
 .DS_Store
+
+
