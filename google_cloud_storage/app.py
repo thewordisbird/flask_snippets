@@ -9,8 +9,8 @@ from wtforms import StringField, FileField, SubmitField
 from google.cloud import storage
 
 # Build web form with flask-wtf
-class CoverImage(FlaskForm):
-    cover_img = FileField("Cover Image")
+class UploadFile(FlaskForm):
+    client_file = FileField("File")
 
 # Set env Variables:
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-storage-key.json"
@@ -21,7 +21,7 @@ UPLOAD_FOLDER = "./uploads"
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 CLOUD_STORAGE_BUCKET = os.environ["CLOUD_STORAGE_BUCKET"]
 
-app = Flask(__name__)
+app = Flask(__name__, templates_folder='./templates')
 app.config.from_mapping({
     'UPLOAD_FOLDER': UPLOAD_FOLDER,
     'SECRET_KEY': 'my_secret'
@@ -40,13 +40,13 @@ def to_cloud():
     variable set up. Also must grant permission to service account on project to
     allow read/write permission.
     """
-    form = CoverImage()
+    form = UploadFile()
 
     if form.validate_on_submit():
         # Check if the post request has the file part
-        if 'cover_img' not in request.files:
+        if 'client_file' not in request.files:
             return 'No file uploaded.', 400
-        uploaded_file = request.files.get('cover_img')
+        uploaded_file = request.files.get('client_file')
         if uploaded_file.filename == '':
             return 'No file selected.', 400
         if uploaded_file and allowed_file(uploaded_file.filename):
@@ -63,7 +63,7 @@ def to_cloud():
 
             # The public URL can be used to directly access the uploaded file via HTTP.
             return redirect(blob.public_url)
-    return render_template('index.html', form=form)
+    return render_template('upload.html', form=form)
 
 @app.route('/from_cloud/<filename>')
 def from_cloud(filename, url):
