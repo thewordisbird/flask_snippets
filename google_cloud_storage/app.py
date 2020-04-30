@@ -16,14 +16,12 @@ class UploadFile(FlaskForm):
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-storage-key.json"
 os.environ["CLOUD_STORAGE_BUCKET"] = "twib-flask-storage"
 
-# Config Variables
-UPLOAD_FOLDER = "./uploads"
+# Global Variables
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 CLOUD_STORAGE_BUCKET = os.environ["CLOUD_STORAGE_BUCKET"]
 
-app = Flask(__name__, templates_folder='./templates')
+app = Flask(__name__)
 app.config.from_mapping({
-    'UPLOAD_FOLDER': UPLOAD_FOLDER,
     'SECRET_KEY': 'my_secret'
 })
 

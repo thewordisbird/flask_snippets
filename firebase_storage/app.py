@@ -13,17 +13,15 @@ class UploadFile(FlaskForm):
     client_file = FileField("File")
 
 # Set env Variables:
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-storage-key.json"
-os.environ["CLOUD_STORAGE_BUCKET"] = "twib-flask-storage"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-snippets-key.json"
+os.environ["CLOUD_STORAGE_BUCKET"] = "flask-snippets.appspot.com"
 
-# Config Variables
-UPLOAD_FOLDER = "./uploads"
+# Global Variables
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 CLOUD_STORAGE_BUCKET = os.environ["CLOUD_STORAGE_BUCKET"]
 
-app = Flask(__name__, templates_folder='./templates')
+app = Flask(__name__)
 app.config.from_mapping({
-    'UPLOAD_FOLDER': UPLOAD_FOLDER,
     'SECRET_KEY': 'my_secret'
 })
 
@@ -31,6 +29,14 @@ def allowed_file(filename):
     """Validate file extensions"""
     return '.' in filename and \
         filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.errorhandler(500)
+def server_error(e):
+    logging.exception('An error occurred during a request.')
+    return """
+    An internal error occurred: <pre>{}</pre>
+    See logs for full stacktrace.
+    """.format(e), 500
 
 @app.route('/to_cloud', methods=['GET', 'POST'])
 def to_cloud():
