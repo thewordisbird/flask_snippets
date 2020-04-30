@@ -32,14 +32,6 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.errorhandler(500)
-def server_error(e):
-    logging.exception('An error occurred during a request.')
-    return """
-    An internal error occurred: <pre>{}</pre>
-    See logs for full stacktrace.
-    """.format(e), 500
-
 @app.route('/to_cloud', methods=['GET', 'POST'])
 def to_cloud():
     """Upload file from client to Google Cloud Storage
