@@ -13,7 +13,7 @@ class CoverImage(FlaskForm):
     cover_img = FileField("Cover Image")
 
 # Set env Variables:
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-storage-275600-5b3747773121.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-storage-key.json"
 os.environ["CLOUD_STORAGE_BUCKET"] = "twib-flask-storage"
 
 # Config Variables
@@ -31,7 +31,7 @@ def allowed_file(filename):
     """Validate file extensions"""
     return '.' in filename and \
         filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
-        
+
 @app.route('/to_cloud', methods=['GET', 'POST'])
 def to_cloud():
     """Upload file from client to Google Cloud Storage
