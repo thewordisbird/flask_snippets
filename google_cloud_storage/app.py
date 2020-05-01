@@ -1,3 +1,9 @@
+"""Connect to Google Cloud Storage
+
+This requires a starting a google project and creating a cloud storage bucket in the 
+console. Additionally, in order to publically view the file a permission rule for the
+cloud storage bucket needs be created that gives allUsers read permission.
+"""
 import os
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template
 from werkzeug.utils import secure_filename

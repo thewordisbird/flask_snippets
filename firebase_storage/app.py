@@ -1,3 +1,9 @@
+"""Connect to Firebase Cloud Storage
+
+This requires a starting a firebase project and creating a cloud storage bucket in the 
+Firebase console. Additionally, in order to publically view the file a permission rule for the
+cloud storage bucket on google cloud needs be created that gives allUsers read permission.
+"""
 import os
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template
 from werkzeug.utils import secure_filename
