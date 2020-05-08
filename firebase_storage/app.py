@@ -14,10 +14,6 @@ from wtforms import StringField, FileField, SubmitField
 # Google cloud storage api
 from google.cloud import storage
 
-# Build web form with flask-wtf
-class UploadFile(FlaskForm):
-    client_file = FileField("File")
-
 # Set env Variables:
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./keys/flask-snippets-key.json"
 os.environ["CLOUD_STORAGE_BUCKET"] = "flask-snippets.appspot.com"
@@ -25,6 +21,10 @@ os.environ["CLOUD_STORAGE_BUCKET"] = "flask-snippets.appspot.com"
 # Global Variables
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 CLOUD_STORAGE_BUCKET = os.environ["CLOUD_STORAGE_BUCKET"]
+
+# Build web form with flask-wtf
+class UploadFile(FlaskForm):
+    client_file = FileField("File")
 
 app = Flask(__name__)
 app.config.from_mapping({
