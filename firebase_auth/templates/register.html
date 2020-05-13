@@ -6,7 +6,18 @@
 <div class="container">
     <h4>Register</h4>
 
-    <form method=post class="col s6 offset-s6">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+                {% for message in messages %}
+                    <div class="col s6 card-panel red lighten-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method=post>
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="col s12">
