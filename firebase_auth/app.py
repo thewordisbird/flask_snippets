@@ -5,6 +5,8 @@ Login and manage users with firebase authentication.
 import os
 import datetime
 import json
+from functools import wraps
+
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, jsonify, abort, make_response
 from werkzeug.security import generate_password_hash
 
@@ -42,6 +44,30 @@ app.config.from_mapping({
 
 csrf = CSRFProtect(app)
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        print('Wrapper')
+        session_cookie = request.cookies.get('firebase')
+        print(f'Wrapper - Session Cookie Val: {session_cookie}')
+        if not session_cookie:
+            # Session cookie is unavailable. Force user to login.
+            print('Wrapper - Session cookie unavailable')
+            return redirect(url_for('login', next=request.url))
+
+        # Verify the session cookie. In this case an additional check is added to detect
+        # if the user's Firebase session was revoked, user deleted/disabled, etc.
+        try:
+            decoded_claims = auth.verify_session_cookie(session_cookie, check_revoked=True)
+            print('Wrapper - Yielding to funciton')
+            return f(*args, **kwargs)
+        except auth.InvalidSessionCookieError:
+            # Session cookie is invalid, expired or revoked. Force user to login.
+            print("Wrapper - Session cookie invalid")
+            return redirect(url_for('login', next=request.url))
+    return decorated_function
+
+
 @app.route('/', methods=['GET'])
 def index():
     return "<h4>Index</h4>"
@@ -70,25 +96,10 @@ def login():
 
 
 @app.route('/profile', methods=['GET'])
+@login_required
 def access_restricted_content():
-    print('In profile')
-    session_cookie = request.cookies.get('firebase')
-    print(f'Profile - Session Cookie Val: {session_cookie}')
-    if not session_cookie:
-        # Session cookie is unavailable. Force user to login.
-        print('Profile - Session cookie unavailable')
-        return redirect('/login')
-
-    # Verify the session cookie. In this case an additional check is added to detect
-    # if the user's Firebase session was revoked, user deleted/disabled, etc.
-    try:
-        decoded_claims = auth.verify_session_cookie(session_cookie, check_revoked=True)
-        
-        return render_template('profile.html')
-    except auth.InvalidSessionCookieError:
-        # Session cookie is invalid, expired or revoked. Force user to login.
-        print("Profile - Session cookie invalid")
-        return redirect('/login')
+    return render_template('profile.html')
+     
 
 @app.route('/test', methods=['GET'])
 def test():
@@ -98,8 +109,7 @@ def test():
 def session_login():
     print('In SessionLogin')
     
-    data = request.get_json()
-    id_token = data['idToken']
+    id_token = request.form.get('idToken')
     expires_in = datetime.timedelta(days=5)
     try:
         # Create the session cookie. This will also verify the ID token in the process.

@@ -6,14 +6,28 @@
     const btnLogin = document.getElementById('btnLogin');
     const csrfToken = document.getElementById('csrf_token');
 
-    function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
+    /*function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
         const xhttp = new XMLHttpRequest;
         let jsonData = {idToken: idToken}
         xhttp.open("POST", endPoint, idToken);
         xhttp.setRequestHeader("Content-type", "application/json;charset=UTF-8");
         xhttp.setRequestHeader("X-CSRFToken", csrfToken); // CSRF Protection
         xhttp.send(JSON.stringify(jsonData));
-    };
+    };*/
+    const postIdTokenToSessionLogin = function(url, idToken, csrfToken) {
+        // POST to session login endpoint.
+        return $.ajax({
+          type:'POST',
+          headers: {
+            'X-CSRFToken': csrfToken
+          },
+          url: url,
+          data: {idToken: idToken},
+          dataType: 'json',
+          contentType: 'application/x-www-form-urlencoded'
+        });
+      };
+
 
     // Add Login Event
     btnLogin.addEventListener('click', e => {
@@ -44,10 +58,8 @@
     firebase.auth().onAuthStateChanged(firebaseUser => {
         if (firebaseUser) {
             console.log('logged in');
-            btnSignOUt.classList.remove('hide')
         } else {
             console.log('Not logged in');
-            btnSignOUt.classList.add('hide')
         }
     });
 }());
