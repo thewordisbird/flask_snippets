@@ -124,6 +124,14 @@ def session_login():
         print(f'error: {e.args}')
         return abort(401, 'SessionLogin - Failed to create a session cookie')
 
+@app.route('/sessionLogout', methods=['GET'])
+def session_logout():
+    response = make_response(redirect('/login'))
+    response.set_cookie('firebase', expires=0)
+    return response
+
+
+
 @app.route('/set')
 def set_cookie():
     resp = make_response(redirect(url_for('endpoint')))
