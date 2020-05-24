@@ -1,77 +1,52 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Easy Auth</title>
-        <meta charset="UTF-8">
-        <!-- The core Firebase JS SDK is always required and must be listed first -->
-        <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
-        <script>
-            // Your web app's Firebase configuration
-            var firebaseConfig = {
-                apiKey: "AIzaSyATzfqKfOe-1prqyRr4bBAnGBvZvrJPDG4",
-                authDomain: "flask-snippets.firebaseapp.com",
-                databaseURL: "https://flask-snippets.firebaseio.com",
-                projectId: "flask-snippets",
-                storageBucket: "flask-snippets.appspot.com",
-                messagingSenderId: "20609874359",
-                appId: "1:20609874359:web:99373750df0393648c5032"
-            };
-            // Initialize Firebase
-            firebase.initializeApp(firebaseConfig);
-        </script>
-        <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.js"></script>
-        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css" />
-        <script type="text/javascript">
-            // FirebaseUI config.
-            // As httpOnly cookies are to be used, do not persist any state client side.
-            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
-            var uiConfig = {
-                callbacks: {
-                    signInSuccessWithAuthResult: function() {
-                        return firebase.auth().currentUser.getIdToken().then(idToken = > {
-    // Session login endpoint is queried and the session cookie is set.
-    // CSRF protection should be taken into account.
-    // ...
-    const csrfToken = getCookie('csrfToken')
-    return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken);
-  });
-}).then(() => {
-  // A page redirect would suffice as the persistence is set to NONE.
-  return firebase.auth().signOut();
-}).then(() => {
-  window.location.assign('/profile');
-});,
-                        uiShown: function() {
-                        // The widget is rendered.
-                        // Hide the loader.
-                        document.getElementById('loader').style.display = 'none';
-                        }
-                    },
-                signInSuccessUrl: "{{ url_for('index') }}",
-                signInOptions: [
-                    // Leave the lines as is for the providers you want to offer your users.
-                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    firebase.auth.EmailAuthProvider.PROVIDER_ID
-                ],
-                // tosUrl and privacyPolicyUrl accept either url string or a callback
-                // function.
-                // Terms of service url/callback.
-                tosUrl: '<your-tos-url>',
-                // Privacy policy url/callback.
-                privacyPolicyUrl: function() {
-                window.location.assign('<your-privacy-policy-url>');
-                }
-            };
-            // Initialize the FirebaseUI Widget using Firebase.
-            var ui = new firebaseui.auth.AuthUI(firebase.auth());
-            // The start method will wait until the DOM is loaded.
-            ui.start('#firebaseui-auth-container', uiConfig);
-        </script>
-    </head>
-    <body>
-        <h1 align="center">Firebase Auth Quickstart Demo</h1>
-        <div id="firebaseui-auth-container"></div>
-        <div id="loader">Loading...</div>
-    </body>
-</html>
+{% extends 'base.html' %}
+
+
+{% block title %}Firebase Login{% endblock %}
+{% block content %}
+<div class="container">
+    <h4>Login</h4>
+
+   
+        {{ form.hidden_tag() }}
+        {{ form.id_token(type="hidden") }}
+        <div class="row">
+            <div class="col s12">
+                <div class="input-field col s6">
+                    {{ form.email(id="txtEmail") }}
+                    {{ form.email.label }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <div class="input-field col s6">
+                    {{ form.password(id="txtPassword") }}
+                    {{ form.password.label }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12">
+            <label>
+                {{ form.remember_me()}}
+                <span>{{ form.remember_me.label }}</span>
+            </label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col s2">
+                <button id="btnLogin" class="btn waves-effect waves-light" type="submit" name="action">Login
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </div>
+   
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
+    <script src="{{ url_for('static', filename='scripts/login.js') }}"></script>
+{% endblock %}

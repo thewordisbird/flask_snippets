@@ -5,5 +5,12 @@
 {% block content %}
 <div class="container">
     <h4>Profile</h4>
-<a href="{{ url_for('session_logout') }}">Log Out</a>
+    <button id="btnLogOut" class="btn waves-effect waves-light" type="submit" name="action">Log Out
+    <i class="material-icons right">send</i>
+</button>
+{% endblock %}
+
+
+{% block body_scripts %}
+    <script src="{{ url_for('static', filename='scripts/logout.js') }}"></script>
 {% endblock %}

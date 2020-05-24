@@ -5,6 +5,9 @@
             <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
             <!-- Compiled and minified CSS -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+            <!-- The core Firebase JS SDK is always required and must be listed first -->
+            <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+            <script src="{{ url_for('static', filename='scripts/init.js') }}"></script>
             {% block head_scripts %}{% endblock %}
             {% block style %}{% endblock %}
             <title>{% block title %}{% endblock %}</title>

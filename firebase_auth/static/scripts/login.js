@@ -5,6 +5,7 @@
     const txtPassWord = document.getElementById('txtPassword');
     const btnLogin = document.getElementById('btnLogin');
     const csrfToken = document.getElementById('csrf_token');
+    const btnLogOut = document.getElementById('btnLogOut')
 
     /*function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
         const xhttp = new XMLHttpRequest;
@@ -53,14 +54,7 @@
             window.location.assign('/profile');
         });
     });
-
-    // Add Realtime Status Listener
-    firebase.auth().onAuthStateChanged(firebaseUser => {
-        if (firebaseUser) {
-            console.log('logged in');
-        } else {
-            console.log('Not logged in');
-        }
-    });
+    
+    
 }());
 

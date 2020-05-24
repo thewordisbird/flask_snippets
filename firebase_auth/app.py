@@ -90,9 +90,10 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    print('in login')
     form = LoginForm()
     
-    return render_template('login2.html', form=form)
+    return render_template('login.html', form=form)
 
 
 @app.route('/profile', methods=['GET'])
@@ -124,13 +125,13 @@ def session_login():
         print(f'error: {e.args}')
         return abort(401, 'SessionLogin - Failed to create a session cookie')
 
-@app.route('/sessionLogout', methods=['GET'])
+@app.route('/sessionLogout', methods=['POST'])
+@csrf.exempt
 def session_logout():
-    response = make_response(redirect('/login'))
-    response.set_cookie('firebase', expires=0)
-    return response
-
-
+    print('in session logout')
+    resp = jsonify({'status': 'success'})
+    resp.set_cookie('firebase', expires=0)
+    return resp
 
 @app.route('/set')
 def set_cookie():
