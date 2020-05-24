@@ -1,12 +1,11 @@
 (function() {
    
-    const loginForm = document.getElementById('loginForm');
     const txtEmail = document.getElementById('txtEmail');
     const txtPassWord = document.getElementById('txtPassword');
     const btnLogin = document.getElementById('btnLogin');
     const csrfToken = document.getElementById('csrf_token');
     const btnLogOut = document.getElementById('btnLogOut')
-
+    const btnGoogle = document.getElementById('btnGoogle')
     /*function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
         const xhttp = new XMLHttpRequest;
         let jsonData = {idToken: idToken}
@@ -15,7 +14,7 @@
         xhttp.setRequestHeader("X-CSRFToken", csrfToken); // CSRF Protection
         xhttp.send(JSON.stringify(jsonData));
     };*/
-    const postIdTokenToSessionLogin = function(url, idToken, csrfToken) {
+    const postIdTokenToSessionLogin = (url, idToken, csrfToken) => {
         // POST to session login endpoint.
         return $.ajax({
           type:'POST',
@@ -38,7 +37,7 @@
         const auth = firebase.auth();
 
         // As httpOnly cookies are to be used, do not persist any state client side.
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+        auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
         
         // Sign In
         auth.signInWithEmailAndPassword(email, pass).then(({ user }) => {
@@ -56,10 +55,38 @@
     });
 
     // Add Oauth2 Sign In With Google Login Event
+    btnGoogle.addEventListener('click', e=> {
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // As httpOnly cookies are to be used, do not persist any state client side.
+        auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
+
+        // Popup Provider
+        auth.signInWithPopup(provider).then(result => {
+            console.log('idTOken', result.user.getIdToken());
+            return postIdTokenToSessionLogin('/sessionLogin', result.credential.idToken, csrfToken.value)
+        }).then(() => {
+            // A page redirect would suffice as the persistence is set to NONE.
+            return auth.signOut();
+        }).then(() => {
+            window.location.assign('/profile');
+        });
+
+
+
+    });
+    
+    /*
     function onSignIn(googleUser) {
         console.log('Google Auth Response', googleUser);
+        const auth = firebase.auth();
+        
+        // As httpOnly cookies are to be used, do not persist any state client side.
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+
         // We need to register an Observer on Firebase Auth to make sure auth is initialized.
-        var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
+        const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
           unsubscribe();
           // Check if we are already signed-in Firebase with the correct user.
           if (!isUserEqual(googleUser, firebaseUser)) {
@@ -92,15 +119,10 @@
             console.log('User already signed-in Firebase.');
           }
         });
-      };
+      }
         
-            
-            
-            // Add catch above
-            
-            
-
       // check that the Google user is not already signed-in Firebase to avoid un-needed re-auth
+      /*
       function isUserEqual(googleUser, firebaseUser) {
         if (firebaseUser) {
           var providerData = firebaseUser.providerData;
@@ -114,7 +136,7 @@
         }
         return false;
       }
-    
+    */
     
 }());
 

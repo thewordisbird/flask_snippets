@@ -115,6 +115,7 @@ def session_login():
     print('In SessionLogin')
     
     id_token = request.form.get('idToken')
+    print(id_token)
     expires_in = datetime.timedelta(days=5)
     try:
         # Create the session cookie. This will also verify the ID token in the process.
