@@ -32,7 +32,7 @@ class RegisterForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
-    confirm_password = PasswordField("Password", validators=[DataRequired(), EqualTo('password')])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password')])
 
 # Initialize Firebase
 firebase_admin.initialize_app()
@@ -59,7 +59,7 @@ def login_required(f):
         # if the user's Firebase session was revoked, user deleted/disabled, etc.
         try:
             decoded_claims = auth.verify_session_cookie(session_cookie, check_revoked=True)
-            print('Wrapper - Yielding to funciton')
+            #print(decoded_claims)
             return f(*args, **kwargs)
         except auth.InvalidSessionCookieError:
             # Session cookie is invalid, expired or revoked. Force user to login.
@@ -99,7 +99,11 @@ def login():
 @app.route('/profile', methods=['GET'])
 @login_required
 def access_restricted_content():
-    return render_template('profile.html')
+    session_cookie = request.cookies.get('firebase')
+    decoded_claims = auth.verify_session_cookie(session_cookie, check_revoked=True)
+    uid = decoded_claims.get('user_id')
+    email = decoded_claims.get('email')
+    return render_template('profile.html', email=email)
      
 
 @app.route('/test', methods=['GET'])
