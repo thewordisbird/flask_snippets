@@ -6,6 +6,7 @@
     const csrfToken = document.getElementById('csrf_token');
     const btnLogOut = document.getElementById('btnLogOut')
     const btnGoogle = document.getElementById('btnGoogle')
+    const btnFacebook = document.getElementById('btnFacebook')
     /*function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
         const xhttp = new XMLHttpRequest;
         let jsonData = {idToken: idToken}
@@ -62,81 +63,45 @@
         // As httpOnly cookies are to be used, do not persist any state client side.
         auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
 
-        // Popup Provider
-        auth.signInWithPopup(provider).then(result => {
-            console.log('idTOken', result.user.getIdToken());
-            return postIdTokenToSessionLogin('/sessionLogin', result.credential.idToken, csrfToken.value)
+         // Sign In
+         auth.signInWithPopup(provider).then(({ user }) => {
+            // Get the user's ID token as it is needed to exchange for a session cookie.
+            return user.getIdToken().then(idToken => {
+                // Session login endpoint is queried and the session cookie is set.
+                return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken.value);
+            });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
             return auth.signOut();
         }).then(() => {
             window.location.assign('/profile');
         });
-
-
-
     });
-    
-    /*
-    function onSignIn(googleUser) {
-        console.log('Google Auth Response', googleUser);
-        const auth = firebase.auth();
-        
-        // As httpOnly cookies are to be used, do not persist any state client side.
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
 
-        // We need to register an Observer on Firebase Auth to make sure auth is initialized.
-        const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
-          unsubscribe();
-          // Check if we are already signed-in Firebase with the correct user.
-          if (!isUserEqual(googleUser, firebaseUser)) {
-            // Build Firebase credential with the Google ID token.
-            var credential = firebase.auth.GoogleAuthProvider.credential(
-                googleUser.getAuthResponse().id_token);
-            // Sign in with credential from the Google user.
-            firebase.auth().signInWithCredential(credential)then(({ user }) => {
-                // Get the user's ID token as it is needed to exchange for a session cookie.
-                return user.getIdToken().then(idToken => {
-                    // Session login endpoint is queried and the session cookie is set.
-                    return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken.value);
-                });
-            }).then(() => {
-                // A page redirect would suffice as the persistence is set to NONE.
-                return auth.signOut();
-            }).then(() => {
-                window.location.assign('/profile');
-            }).catch(function(error) {
-              // Handle Errors here.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-              // The email of the user's account used.
-              var email = error.email;
-              // The firebase.auth.AuthCredential type that was used.
-              var credential = error.credential;
-              // ...
+    // Add Oauth2 Sign In With Facebook Login Event
+    btnFacebook.addEventListener('click', e=> {
+        const auth = firebase.auth();
+        const provider = new firebase.auth.FacebookAuthProvider();
+
+        // As httpOnly cookies are to be used, do not persist any state client side.
+        auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
+
+         // Sign In
+         auth.signInWithPopup(provider).then(({ user }) => {
+            // Get the user's ID token as it is needed to exchange for a session cookie.
+            return user.getIdToken().then(idToken => {
+                // Session login endpoint is queried and the session cookie is set.
+                return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken.value);
             });
-          } else {
-            console.log('User already signed-in Firebase.');
-          }
+        }).then(() => {
+            // A page redirect would suffice as the persistence is set to NONE.
+            return auth.signOut();
+        }).then(() => {
+            window.location.assign('/profile');
         });
-      }
+    });
+
         
-      // check that the Google user is not already signed-in Firebase to avoid un-needed re-auth
-      /*
-      function isUserEqual(googleUser, firebaseUser) {
-        if (firebaseUser) {
-          var providerData = firebaseUser.providerData;
-          for (var i = 0; i < providerData.length; i++) {
-            if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
-                providerData[i].uid === googleUser.getBasicProfile().getId()) {
-              // We don't need to reauth the Firebase connection.
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-    */
     
 }());
 

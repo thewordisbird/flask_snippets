@@ -1,9 +1,4 @@
 {% extends 'base.html' %}
-{% block meta %}
-<meta name="google-signin-client_id" content="20609874359-0gdqkjff2e05uhrq7tvvj74ou4b8recr.apps.googleusercontent.com">
-<meta name="google-signin-cookiepolicy" content="single_host_origin">
-<meta name="google-signin-scope" content="profile email">
-{% endblock %}
 {% block head_scripts %}
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
@@ -11,18 +6,56 @@
 {% block title %}Firebase Login{% endblock %}
 
 {% block content %}
+<div class="valign-wrapper row login-box">
+    <div class="col card hoverable s10 pull-s1 m4 pull-m4 l2 pull-l5">
+        <div class="card-content">
+            {{ form.hidden_tag() }}
+            {{ form.id_token(type="hidden") }}
+
+            <div class="row">
+                <button id="btnGoogle" class="btn waves-effect waves-light" type="submit" name="action">Google Login
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+            <div class="row">
+                <button id="btnFacebook" class="btn waves-effect waves-light" type="submit" name="action">Facebook Login
+                    <i class="material-icons right">send</i>
+                </button>
+
+            </div>
+          <span class="card-title">Enter credentials</span>
+          <div class="row">
+            <div class="input-field col s12">
+                {{ form.email(id="txtEmail") }}
+                {{ form.email.label }}
+            </div>
+            <div class="input-field col s12">
+                {{ form.password(id="txtPassword") }}
+                {{ form.password.label }}
+                <span class="helper-text right-align"><a href="#">Forgot password?</a></span>
+            </div>
+          </div>
+          
+        </div>
+        <div class="card-action center-align">
+            <button id="btnLogin" class="btn waves-effect waves-light" type="submit" name="action">Login
+                <i class="material-icons right">send</i>
+            </button>
+            
+           
+        </div>
+    </div>
+  </div>
+
+
+
+
+<!--
+
 <div class="container">
     <h4>Login</h4>
         {{ form.hidden_tag() }}
         {{ form.id_token(type="hidden") }}
-        <div class="row">
-            <div class="col s6"> 
-                <div class="g-signin2" data-onsuccess="onSignIn"></div>
-            </div>
-            <div class="col s6"> 
-                <button onclick="gSignOut()"> Sign Out</button>
-            </div>
-        </div>
         <div class="row">
             <div class="col s2">
                 <button id="btnGoogle" class="btn waves-effect waves-light" type="submit" name="action">Google Login
@@ -73,65 +106,13 @@
             <div class="col s4"><a href="#">Forgot username/password?</a></div>
         </div>
    
-</div>
+</div>-->
 {% endblock %}
 
 {% block body_scripts %}
  <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
- 
  <script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-auth.js"></script>
-    <script src="{{ url_for('static', filename='scripts/login.js') }}"></script>
-   <script>
-       function onSignIn(googleUser) {
-  console.log('Google Auth Response', googleUser);
-  // We need to register an Observer on Firebase Auth to make sure auth is initialized.
-  var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
-    unsubscribe();
-    // Check if we are already signed-in Firebase with the correct user.
-    if (!isUserEqual(googleUser, firebaseUser)) {
-      // Build Firebase credential with the Google ID token.
-      var credential = firebase.auth.GoogleAuthProvider.credential(
-          googleUser.getAuthResponse().id_token);
-          var id_token = googleUser.getAuthResponse().id_token
-          console.log('idToken', id_token)
-      // Sign in with credential from the Google user.
-      firebase.auth().signInWithCredential(credential).then(({ user }) => {
-          console.log(user);
-      }).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
-      });
-    } else {
-      console.log('User already signed-in Firebase.', firebaseUser);
-    }
-  });
-};
-
-function isUserEqual(googleUser, firebaseUser) {
-  if (firebaseUser) {
-    var providerData = firebaseUser.providerData;
-    for (var i = 0; i < providerData.length; i++) {
-      if (providerData[i].providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
-          providerData[i].uid === googleUser.getBasicProfile().getId()) {
-        // We don't need to reauth the Firebase connection.
-        return true;
-      }
-    }
-  }
-  return false;
-};
-  
-    function gSignOut() {
-        var googleAuth = gapi.auth2.getAuthInstance();
-      googleAuth.signOut().then(function() {
-        firebase.auth().signOut();
-      });
-    }
-   </script>
+ <script src="{{ url_for('static', filename='scripts/login.js') }}"></script>
 {% endblock %}
+
+
