@@ -1,112 +1,91 @@
 {% extends 'base.html' %}
 {% block head_scripts %}
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-
 {% endblock %}
-{% block title %}Firebase Login{% endblock %}
+{% block style %}
+<style>
+    body {
+        background-color: lightgray;
+        height: 100vh;
+    }
+
+    .flexbox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%
+    }
+    .card-title {
+        padding-left: 10px;
+    }
+
+    .card {
+            max-width: 400px;
+        }
+
+    .btn-block {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="valign-wrapper row login-box">
-    <div class="col card hoverable s10 pull-s1 m4 pull-m4 l2 pull-l5">
+<div class="flexbox">
+    <div class="card">
+        <div class="card-title teal lighten-2 white-text section">
+            Log In
+        </div>
         <div class="card-content">
+            <!-- Login With Socails-->
+            <div class="row">
+                <div class="col s12">
+                    <button id="btnGoogle" class="btn btn-block waves-effect waves-light transparent" type="submit" name="action">
+                        <span class="teal-text text-lighten-2">
+                            Log in with Google
+                            <i class="fab fa-google left"></i>
+                        </span>
+                        
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <button id="btnFacebook" class="btn btn-block waves-effect waves-light transparent" type="submit" name="action">
+                        <span class="teal-text text-lighten-2">
+                            Log in with Facebook
+                            <i class="fab fa-facebook-f left"></i>
+                        </span>
+                        
+                    </button>
+                </div>
+            </div>
+
             {{ form.hidden_tag() }}
             {{ form.id_token(type="hidden") }}
 
             <div class="row">
-                <button id="btnGoogle" class="btn waves-effect waves-light" type="submit" name="action">Google Login
-                    <i class="material-icons right">send</i>
-                </button>
-            </div>
-            <div class="row">
-                <button id="btnFacebook" class="btn waves-effect waves-light" type="submit" name="action">Facebook Login
-                    <i class="material-icons right">send</i>
-                </button>
-
-            </div>
-          <span class="card-title">Enter credentials</span>
-          <div class="row">
-            <div class="input-field col s12">
-                {{ form.email(id="txtEmail") }}
-                {{ form.email.label }}
-            </div>
-            <div class="input-field col s12">
-                {{ form.password(id="txtPassword") }}
-                {{ form.password.label }}
-                <span class="helper-text right-align"><a href="#">Forgot password?</a></span>
-            </div>
-          </div>
-          
-        </div>
-        <div class="card-action center-align">
-            <button id="btnLogin" class="btn waves-effect waves-light" type="submit" name="action">Login
-                <i class="material-icons right">send</i>
-            </button>
-            
-           
-        </div>
-    </div>
-  </div>
-
-
-
-
-<!--
-
-<div class="container">
-    <h4>Login</h4>
-        {{ form.hidden_tag() }}
-        {{ form.id_token(type="hidden") }}
-        <div class="row">
-            <div class="col s2">
-                <button id="btnGoogle" class="btn waves-effect waves-light" type="submit" name="action">Google Login
-                    <i class="material-icons right">send</i>
-                </button>
-            </div>
-            
-        </div>
-        
-        <div class="row">
-            <div class="col s12">
-                <div class="input-field col s6">
+                <div class="input-field col s12">
                     {{ form.email(id="txtEmail") }}
                     {{ form.email.label }}
                 </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
-                <div class="input-field col s6">
+                <div class="input-field col s12">
                     {{ form.password(id="txtPassword") }}
                     {{ form.password.label }}
+                    <span class="helper-text right-align"><a href="#">Forgot password?</a></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <button id="btnLogin" class="btn btn-block waves-effect waves-light teal lighten-2" type="submit" name="action">Log In
+                        <i class="material-icons right">send</i>
+                    </button>
+                    <span class="helper-text center-align">Not Registerd? <a href=" {{ url_for('register') }}'"">Register Now</a></span>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col s12">
-            <label>
-                {{ form.remember_me()}}
-                <span>{{ form.remember_me.label }}</span>
-            </label>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col s2">
-                <button id="btnLogin" class="btn waves-effect waves-light" type="submit" name="action">Login
-                    <i class="material-icons right">send</i>
-                </button>
-            </div>
-            
-        </div>
-        <div class="row">
-            <div class="col s4"><a href=" {{ url_for('register') }}">No account? Sign up now.</a></div>
-        </div>
-        <div class="row">
-            <div class="col s4"><a href="#">Forgot username/password?</a></div>
-        </div>
-   
-</div>-->
+    </div>
+</div>
 {% endblock %}
 
 {% block body_scripts %}

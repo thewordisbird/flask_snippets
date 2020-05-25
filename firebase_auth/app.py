@@ -106,9 +106,7 @@ def access_restricted_content():
     return render_template('profile.html', email=email)
      
 
-@app.route('/test', methods=['GET'])
-def test():
-    return render_template('login2.html')
+
 
 @app.route('/sessionLogin', methods=['POST'])
 def session_login():
@@ -154,3 +152,8 @@ def endpoint():
     name = request.cookies.get('name')
     print(f'cookie name: {name}')
     return render_template('profile.html')
+
+@app.route('/login_test')
+def login_test():
+    form = LoginForm()
+    return render_template('login_test.html', form=form)
