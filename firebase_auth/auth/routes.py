@@ -4,10 +4,10 @@ import datetime
 
 from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, jsonify, abort, make_response, current_app, Blueprint
 
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, ResetPasswordForm
 from flask_wtf.csrf import CSRFProtect
 
-from firebase_auth import login_required, create_session_cookie
+from firebase_auth import login_required, create_session_cookie, create_new_user, send_password_reset_email
 
 # Try moving this into factory
 csrf = CSRFProtect(current_app)
@@ -24,14 +24,17 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():  
-        try:
-            user = auth.create_user(
-                email=form.data['email'],
-                password=form.data['password'],
-                display_name= form.data['name'])
-            return redirect(url_for('login'))
-        except Exception as e:
-            flash(e.args[0])
+        email = form.data['email']
+        password = form.data['password']
+        display_name = form.data['name']
+        user = create_new_user(email, password, display_name)
+        print(user.uid)
+        # Take user id and add to Firestore user collection
+
+        # Send Email Varification
+        #send_email_varification(user['id_token'])
+        return redirect(url_for('auth.login'))
+        
     return render_template('register.html', form=form)
 
 
@@ -47,6 +50,7 @@ def login():
         if session_cookie:
             resp = jsonify({'status': 'success'})
             expires = datetime.datetime.now() + expires_in
+            # CHANGE TO SECURE FOR PRODUCTION!!
             resp.set_cookie('firebase', session_cookie, expires=expires, httponly=True, secure=False)
             print(f'SessionLogin - returning resp: {resp}')
             return resp
@@ -64,9 +68,13 @@ def access_restricted_content():
     #email = decoded_claims.get('email')
     return render_template('profile.html')
 
-
-@bp.route('/sessionLogin', methods=['POST'])
-
+@bp.route('/resetPassword', methods=['GET', 'POST'])
+def reset_password():
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        send_password_reset_email(form.data['email'])
+        return redirect(url_for('auth.login'))
+    return render_template('reset_password.html', form=form, title='Reset Password')
 
 @bp.route('/sessionLogout', methods=['POST'])
 @csrf.exempt

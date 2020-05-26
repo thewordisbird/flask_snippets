@@ -1,6 +1,8 @@
 from functools import wraps
-
-
+import os
+import json
+import requests
+from requests import HTTPError
 
 # Firebase API
 import firebase_admin
@@ -25,6 +27,7 @@ def login_required(f):
         # if the user's Firebase session was revoked, user deleted/disabled, etc.
         try:
             decoded_claims = verify_session_cookie(session_cookie)
+            print(decoded_claims)
             #print(decoded_claims)
             return f(*args, **kwargs)
         except auth.InvalidSessionCookieError:
@@ -50,9 +53,37 @@ def verify_session_cookie(session_cookie):
     return auth.verify_session_cookie(session_cookie, check_revoked=True)
 
 
+def create_new_user(email, password, display_name):
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password,
+            display_name=display_name)
+        return user
+    except Exception as e:
+        return e
+
+def raise_detailed_error(request_object):
+    try:
+        request_object.raise_for_status()
+    except HTTPError as e:
+        # raise detailed error message
+        # TODO: Check if we get a { "error" : "Permission denied." } and handle automatically
+        raise HTTPError(e, request_object.text)
+
 def send_email_varification(id_token):
-    pass
+    endpoint = f"https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode?key={os.environ.get('WEB_API_KEY')}"
+    headers = {"content-type": "application/json; charset=UTF-8"}
+    data = json.dumps({"requestType": "VERIFY_EMAIL", "idToken": id_token})
+    request_object = requests.post(endpoint, headers=headers, data=data)
+    raise_detailed_error(request_object)
+    return request_object.json()
 
 def send_password_reset_email(email):
-    pass
+    endpoint = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={os.environ.get('WEB_API_KEY')}"
+    headers = {"content-type": "application/json; charset=UTF-8"}
+    data = json.dumps({"requestType": "PASSWORD_RESET", "email": email})
+    request_object = requests.post(endpoint, headers=headers, data=data)
+    raise_detailed_error(request_object)
+    return request_object.json()
 
