@@ -45,7 +45,7 @@
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
-                return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken.value);
+                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
             });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
@@ -68,7 +68,7 @@
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
-                return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken.value);
+                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
             });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
@@ -91,7 +91,7 @@
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
-                return postIdTokenToSessionLogin('/sessionLogin', idToken, csrfToken.value);
+                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
             });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
