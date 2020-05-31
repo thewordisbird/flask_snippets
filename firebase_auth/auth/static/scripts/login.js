@@ -7,6 +7,8 @@
     const btnLogOut = document.getElementById('btnLogOut')
     const btnGoogle = document.getElementById('btnGoogle')
     const btnFacebook = document.getElementById('btnFacebook')
+    const divLoginMessage = document.getElementById('loginMessage')
+
     /*function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
         const xhttp = new XMLHttpRequest;
         let jsonData = {idToken: idToken}
@@ -52,6 +54,9 @@
             return auth.signOut();
         }).then(() => {
             window.location.assign('/profile');
+        }).catch( error => {
+            divLoginMessage.innerHTML = '<span class="login-message">' + error.message + '</span>'
+            
         });
     });
 
