@@ -61,7 +61,10 @@ def create_new_user(email, password, display_name):
             display_name=display_name)
         return user
     except Exception as e:
-        return e
+        raise e
+
+def generate_email_verification_link(user_email):
+    return auth.generate_email_verification_link
 
 def raise_detailed_error(request_object):
     try:

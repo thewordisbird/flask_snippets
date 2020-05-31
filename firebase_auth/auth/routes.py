@@ -7,8 +7,10 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory,
 from .forms import LoginForm, RegisterForm, ResetPasswordForm
 from flask_wtf.csrf import CSRFProtect
 
-from firebase_auth import login_required, create_session_cookie, create_new_user, send_password_reset_email
+from firebase_auth import login_required, create_session_cookie, create_new_user, send_password_reset_email, \
+    send_email_varification, generate_email_verification_link
 
+from email_actions import Email
 # Try moving this into factory
 csrf = CSRFProtect(current_app)
 
@@ -28,11 +30,14 @@ def register():
         password = form.data['password']
         display_name = form.data['name']
         user = create_new_user(email, password, display_name)
-        print(user.uid)
+        print(user)
         # Take user id and add to Firestore user collection
-
+        # On success
         # Send Email Varification
-        #send_email_varification(user['id_token'])
+        ver_link = generate_email_verification_link(user.email)
+        ver_email = Email()
+        ver_message = ver_email.generate_email_verification_message(user.display_name, user.email, ver_link)
+        ver_email.send_email(ver_message)
         return redirect(url_for('auth.login'))
         
     return render_template('register.html', form=form)

@@ -44,6 +44,7 @@
         auth.signInWithEmailAndPassword(email, pass).then(({ user }) => {
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
+               alert(idToken)
                 // Session login endpoint is queried and the session cookie is set.
                 return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
             });
