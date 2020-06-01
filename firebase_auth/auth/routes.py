@@ -83,6 +83,10 @@ def session_logout():
     print('in session logout')
     resp = jsonify({'status': 'success'})
     resp.set_cookie('firebase', expires=0)
+    print(session['_user_id'])
+    if '_user_id' in session:
+        session.pop('_user_id')
+    print(session.get('_user_id', None))
     return resp
 
 
