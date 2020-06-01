@@ -8,16 +8,9 @@
     const btnGoogle = document.getElementById('btnGoogle')
     const btnFacebook = document.getElementById('btnFacebook')
     const divLoginMessage = document.getElementById('loginMessage')
+    const divProviderMessage = document.getElementById('providerMessage')
 
-    /*function postIdTokenToSessionLogin(endPoint, idToken, csrfToken) {
-        const xhttp = new XMLHttpRequest;
-        let jsonData = {idToken: idToken}
-        xhttp.open("POST", endPoint, idToken);
-        xhttp.setRequestHeader("Content-type", "application/json;charset=UTF-8");
-        xhttp.setRequestHeader("X-CSRFToken", csrfToken); // CSRF Protection
-        xhttp.send(JSON.stringify(jsonData));
-    };*/
-    const postIdTokenToSessionLogin = (url, idToken, csrfToken) => {
+    const postIdTokenToSessionLogin = (url, idToken, csrfToken, uid) => {
         // POST to session login endpoint.
         return $.ajax({
           type:'POST',
@@ -25,12 +18,11 @@
             'X-CSRFToken': csrfToken
           },
           url: url,
-          data: {idToken: idToken},
+          data: {idToken: idToken, uid:uid},
           dataType: 'json',
           contentType: 'application/x-www-form-urlencoded'
         });
       };
-
 
     // Add Email/Password Login Event
     btnLogin.addEventListener('click', e => {
@@ -47,7 +39,7 @@
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
-                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
+                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value, user.uid);
             });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
@@ -55,8 +47,7 @@
         }).then(() => {
             window.location.assign('/profile');
         }).catch( error => {
-            divLoginMessage.innerHTML = '<span class="login-message">' + error.message + '</span>'
-            
+            divLoginMessage.innerHTML = '<span class="error-message">' + error.message + '</span>'            
         });
     });
 
@@ -73,13 +64,15 @@
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
-                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
+                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value, user.uid);
             });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
             return auth.signOut();
         }).then(() => {
             window.location.assign('/profile');
+        }).catch( error => {
+            divProviderMessage.innerHTML = '<span class="error-message">' + error.message + '</span>'            
         });
     });
 
@@ -96,17 +89,16 @@
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
-                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value);
+                return postIdTokenToSessionLogin('/login', idToken, csrfToken.value, user.uid);
             });
         }).then(() => {
             // A page redirect would suffice as the persistence is set to NONE.
             return auth.signOut();
         }).then(() => {
             window.location.assign('/profile');
+        }).catch( error => {
+            divProviderMessage.innerHTML = '<span class="error-message">' + error.message + '</span>'            
         });
     });
-
-        
-    
 }());
 

@@ -1,8 +1,7 @@
 import os
 import datetime
 
-
-from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, jsonify, abort, make_response, current_app, Blueprint
+from flask import Flask, flash, request, redirect, url_for, send_from_directory, render_template, jsonify, abort, make_response, current_app, Blueprint, session
 
 from .forms import LoginForm, RegisterForm, ResetPasswordForm
 from flask_wtf.csrf import CSRFProtect
@@ -19,6 +18,7 @@ bp = Blueprint('auth', __name__, static_folder='static')
 def index():
     return "<h4>Index</h4>"
 
+
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -28,35 +28,34 @@ def register():
         password = form.data['password']
         display_name = form.data['name']
         user = create_new_user(email, password, display_name)
-        print(user.uid)
-        # Take user id and add to Firestore user collection
-
-        # Send Email Varification
-        #send_email_varification(user['id_token'])
-        return redirect(url_for('auth.login'))
-        
+        # TODO: connect to firestore db to store additional user info by uid
+        return redirect(url_for('auth.login'))        
     return render_template('register.html', form=form)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    print('in login')
     form = LoginForm()
     
     if request.method == 'POST':
         id_token = request.form.get('idToken')
         expires_in = datetime.timedelta(days=5)
-        session_cookie =  create_session_cookie(id_token, expires_in)
-        if session_cookie:
+        try:
+            session_cookie =  create_session_cookie(id_token, expires_in)
+        except Exception:
+            # TODO: respond with error to display message to user
+            # see create_session_cookie function for info on possible errors
+            abort(401, 'Failed to create a session cookie')
+        else:
+            # Create Flask User session to store uid for user information lookup
+            session['_user_id'] = request.form.get('uid')
+            # Create response to client
             resp = jsonify({'status': 'success'})
             expires = datetime.datetime.now() + expires_in
             # CHANGE TO SECURE FOR PRODUCTION!!
             resp.set_cookie('firebase', session_cookie, expires=expires, httponly=True, secure=False)
-            print(f'SessionLogin - returning resp: {resp}')
             return resp
-        else:
-            abort(401, 'Failed to create a session cookie')
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, title="Login")
 
 
 @bp.route('/profile', methods=['GET'])
@@ -68,6 +67,7 @@ def access_restricted_content():
     #email = decoded_claims.get('email')
     return render_template('profile.html')
 
+
 @bp.route('/resetPassword', methods=['GET', 'POST'])
 def reset_password():
     form = ResetPasswordForm()
@@ -75,6 +75,7 @@ def reset_password():
         send_password_reset_email(form.data['email'])
         return redirect(url_for('auth.login'))
     return render_template('reset_password.html', form=form, title='Reset Password')
+
 
 @bp.route('/sessionLogout', methods=['POST'])
 @csrf.exempt
@@ -84,24 +85,4 @@ def session_logout():
     resp.set_cookie('firebase', expires=0)
     return resp
 
-@bp.route('/set')
-def set_cookie():
-    resp = make_response(redirect(url_for('endpoint')))
-    resp.set_cookie('name', 'sam')
-    return resp
 
-@bp.route('/get')
-def get_cookie():
-    name = request.cookies.get('name')
-    return f'Name is {name}'
-
-@bp.route('/endpoint')
-def endpoint():
-    name = request.cookies.get('name')
-    print(f'cookie name: {name}')
-    return render_template('profile.html')
-
-@bp.route('/login_test')
-def login_test():
-    form = LoginForm()
-    return render_template('login_test.html', form=form)
