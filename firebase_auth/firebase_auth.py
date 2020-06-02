@@ -7,16 +7,17 @@ from requests import HTTPError
 import firebase_admin
 from firebase_admin import credentials, auth
 
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, session, abort
 
 
 def initialize_firebase():
     firebase_admin.initialize_app()
 
-
+# Decorators for login required and restricted access
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        print('in decorator')
         session_cookie = request.cookies.get('firebase')
         if not session_cookie:
             # Session cookie is unavailable. Force user to login.
@@ -34,6 +35,20 @@ def login_required(f):
         #   - RevokedSessionCookieError – If check_revoked is True and the cookie has been revoked.
         #   - CertificateFetchError – If an error occurs while fetching the public key certificates required to verify the session cookie.
     return decorated_function
+
+
+def restricted(**claims):
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            user_claims = auth.get_user(session['_user_id']).custom_claims
+            if user_claims:
+                for claim, value in claims.items():
+                    if claim not in user_claims or user_claims[claim] != value:
+                        return abort(401, 'You are not authorized to view this page :(')
+                return f(*args, **kwargs)
+            return abort(401, 'You are not authorized to view this page :(')
+        return wrapper
+    return decorator
 
 
 def create_session_cookie(id_token, expires_in):
@@ -62,6 +77,17 @@ def create_new_user(email, password, display_name):
         #   - FirebseError - If an error occurs while creating a session cookie
         return e
 
+def decode_claims(uid):
+    return auth.get_user(uid).custom_claims
+
+def set_custom_user_claims(uid, claims):
+    try:
+        auth.set_custom_user_claims(uid, claims)
+    except Exception as e:
+        # Possible Exceptions:
+        #   - ValueError - If input parameters are invlaid
+        #   - FirebseError - If an error occurs while creating a session cookie
+        raise e
 
 # REST API FOR TEMPLATE EMAIL ACTIONS
 def raise_detailed_error(request_object):

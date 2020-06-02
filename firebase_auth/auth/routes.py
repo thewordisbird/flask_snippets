@@ -6,7 +6,7 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory,
 from .forms import LoginForm, RegisterForm, ResetPasswordForm
 from flask_wtf.csrf import CSRFProtect
 
-from firebase_auth import login_required, create_session_cookie, create_new_user, send_password_reset_email
+from firebase_auth import login_required, restricted, create_session_cookie, create_new_user, send_password_reset_email, set_custom_user_claims, decode_claims
 
 # Try moving this into factory
 csrf = CSRFProtect(current_app)
@@ -45,7 +45,7 @@ def login():
         except Exception:
             # TODO: respond with error to display message to user
             # see create_session_cookie function for info on possible errors
-            abort(401, 'Failed to create a session cookie')
+            return abort(401, 'Failed to create a session cookie')
         else:
             # Create Flask User session to store uid for user information lookup
             session['_user_id'] = request.form.get('uid')
@@ -88,5 +88,24 @@ def session_logout():
         session.pop('_user_id')
     print(session.get('_user_id', None))
     return resp
+
+
+@bp.route('/adminOnly')
+@restricted(admin=True)
+def admin_only():
+    return render_template('admin_only.html', title='Admin')
+
+
+@bp.route('/makeAdmin')
+def set_admin():
+    print(decode_claims(session['_user_id']))
+    set_custom_user_claims(session['_user_id'], {'admin': True})
+    print(decode_claims(session['_user_id']))
+    return redirect(url_for('auth.access_restricted_content'))
+
+@bp.route('/checkAdmin')
+def check_admin():
+    print(decode_claims(session['_user_id']))
+    return redirect(url_for('auth.access_restricted_content'))
 
 

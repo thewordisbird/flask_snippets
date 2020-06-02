@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    body {
+        background-color: lightgray;
+        height: 100vh;
+    }
+
+    .flexbox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%
+    }
+    .card-title {
+        padding-left: 10px;
+    }
+
+    .card {
+            width: 800px;
+        }
+
+    .btn-block {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="flexbox">
+    <div class="card">
+        <div class="card-title teal lighten-2 white-text section">
+            Admin Access Only
+        </div>
+
+        <div class="card-content">
+            Content Only Visable to Administrator
+        </div>
+    </div>
+</div>
+{% endblock %}

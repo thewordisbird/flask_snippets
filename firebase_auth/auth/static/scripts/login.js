@@ -10,6 +10,18 @@
     const divLoginMessage = document.getElementById('loginMessage')
     const divProviderMessage = document.getElementById('providerMessage')
 
+    const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+    // Prompt to select account on google login
+    googleAuthProvider.setCustomParameters({
+        prompt: 'select_account'
+    });
+
+    const facebookAuthProvider = new firebase.auth.FacebookAuthProvider();
+    // Prompt to select account on facebook login
+    facebookAuthProvider.setCustomParameters({
+        display: 'select_account'
+    });
+
     const postIdTokenToSessionLogin = (url, idToken, csrfToken, uid) => {
         // POST to session login endpoint.
         return $.ajax({
@@ -60,7 +72,7 @@
         auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
 
          // Sign In
-         auth.signInWithPopup(provider).then(({ user }) => {
+         auth.signInWithPopup(googleAuthProvider).then(({ user }) => {
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
@@ -85,7 +97,7 @@
         auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
 
          // Sign In
-         auth.signInWithPopup(provider).then(({ user }) => {
+         auth.signInWithPopup(facebookAuthProvider).then(({ user }) => {
             // Get the user's ID token as it is needed to exchange for a session cookie.
             return user.getIdToken().then(idToken => {
                 // Session login endpoint is queried and the session cookie is set.
