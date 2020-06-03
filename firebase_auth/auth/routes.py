@@ -104,6 +104,7 @@ def set_admin():
     return redirect(url_for('auth.access_restricted_content'))
 
 @bp.route('/checkAdmin')
+#comment
 def check_admin():
     print(decode_claims(session['_user_id']))
     return redirect(url_for('auth.access_restricted_content'))
